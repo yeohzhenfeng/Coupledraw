@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💞 情侣抽签 / 随机挑战</title>
+  <style>
+    :root{
+      --bg1:#0f172a;
+      --bg2:#1f2937;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.12);
+      --stroke: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --pink:#ff4da6;
+      --cyan:#4de3ff;
+      --good:#46f59a;
+      --warn:#ffcf4d;
+      --bad:#ff5a5a;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --r: 18px;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:
+        radial-gradient(1200px 800px at 20% 10%, rgba(255,77,166,.20), transparent 60%),
+        radial-gradient(900px 700px at 80% 20%, rgba(77,227,255,.18), transparent 60%),
+        radial-gradient(900px 700px at 60% 90%, rgba(70,245,154,.10), transparent 65%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:22px 16px 40px;
+    }
+    header{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      justify-content:space-between;
+      margin-bottom:16px;
+    }
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .title h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.3px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .chiprow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    .chip{
+      padding:8px 10px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      backdrop-filter: blur(10px);
+    }
+    .chip b{ color:var(--text); font-weight:650; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+    }
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+      header{ flex-direction:column; gap:12px; }
+      .chiprow{ justify-content:flex-start; }
+    }
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--stroke);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), transparent);
+    }
+    .card .hd h2{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+      color:rgba(255,255,255,.88);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .card .bd{ padding:14px; }
+
+    .btnrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    button{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      border-radius: 14px;
+      padding:12px 14px;
+      font-weight:700;
+      font-size:14px;
+      color:rgba(255,255,255,.92);
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: 0 10px 30px rgba(0,0,0,.20);
+      transition: transform .12s ease, background .12s ease, border-color .12s ease, opacity .12s ease;
+      user-select:none;
+    }
+    button:hover{ transform: translateY(-1px); background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.22); }
+    button:active{ transform: translateY(0px) scale(.99); }
+    button[disabled]{ opacity:.5; cursor:not-allowed; }
+    .primary{
+      background: linear-gradient(135deg, rgba(255,77,166,.95), rgba(77,227,255,.80));
+      border-color: rgba(255,255,255,.25);
+      color: #0b1020;
+      text-shadow: none;
+    }
+    .good{ background: rgba(70,245,154,.12); border-color: rgba(70,245,154,.28); }
+    .warn{ background: rgba(255,207,77,.12); border-color: rgba(255,207,77,.28); }
+    .bad{ background: rgba(255,90,90,.12); border-color: rgba(255,90,90,.28); }
+    .mini{
+      padding:10px 12px;
+      font-size:13px;
+      border-radius:12px;
+    }
+
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 520px){
+      .split{ grid-template-columns:1fr; }
+    }
+
+    label{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      font-size:13px;
+      color:var(--muted);
+    }
+    input[type="checkbox"]{
+      width:18px; height:18px;
+      accent-color: var(--pink);
+    }
+    input[type="number"], input[type="text"], textarea{
+      width:100%;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+      font-size:13px;
+    }
+    textarea{
+      min-height:140px;
+      resize:vertical;
+      line-height:1.5;
+    }
+    .hint{
+      margin-top:8px;
+      font-size:12px;
+      color: rgba(255,255,255,.62);
+      line-height:1.45;
+    }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      padding:12px 12px;
+      border-radius:14px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .row .txt{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      flex:1;
+      min-width:0;
+    }
+    .row .txt .t{
+      font-weight:750;
+      font-size:14px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .row .txt .s{
+      font-size:12px;
+      color: rgba(255,255,255,.62);
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      padding:4px 8px;
+      border-radius:999px;
+    }
+    .row .actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .hr{ height:1px; background: rgba(255,255,255,.10); margin:12px 0; }
+
+    /* Modal */
+    .modalMask{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index: 50;
+    }
+    .modal{
+      width:min(720px, 96vw);
+      border-radius: 22px;
+      border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.18));
+      backdrop-filter: blur(14px);
+      box-shadow: 0 26px 90px rgba(0,0,0,.55);
+      overflow:hidden;
+      transform: translateY(6px) scale(.985);
+      opacity:0;
+      transition: transform .18s ease, opacity .18s ease;
+    }
+    .modal.show{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+    .modal .mhd{
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background: rgba(255,255,255,.06);
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    .modal .mhd .ttl{
+      font-weight:850;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .modal .mbd{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .big{
+      font-size:22px;
+      font-weight:900;
+      line-height:1.25;
+    }
+    .sub{
+      color: rgba(255,255,255,.70);
+      font-size:13px;
+      line-height:1.55;
+    }
+    .timer{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 12px;
+      border-radius:16px;
+      background: rgba(0,0,0,.20);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .timer .left{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .timer .left .k{ font-size:12px; color: rgba(255,255,255,.62); }
+    .timer .left .v{ font-size:18px; font-weight:900; }
+    .progress{
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .progress > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(255,77,166,.95), rgba(77,227,255,.85));
+      border-radius:999px;
+      transition: width .25s ease;
+    }
+
+    /* Confetti */
+    .confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index: 60;
+    }
+    .c{
+      position:absolute;
+      width:10px; height:14px;
+      opacity:.95;
+      border-radius:3px;
+      transform: translateY(-20px) rotate(0deg);
+      animation: fall linear forwards;
+      filter: drop-shadow(0 10px 12px rgba(0,0,0,.25));
+    }
+    @keyframes fall{
+      to{
+        transform: translateY(calc(100vh + 40px)) rotate(720deg);
+        opacity:1;
+      }
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(12px);
+      color: rgba(255,255,255,.92);
+      padding:10px 12px;
+      border-radius: 14px;
+      font-size:13px;
+      box-shadow: 0 20px 70px rgba(0,0,0,.40);
+      display:none;
+      z-index: 70;
+      max-width:min(720px, 92vw);
+      text-align:center;
+    }
+    .mutedLink{
+      color: rgba(255,255,255,.72);
+      text-decoration: underline;
+      text-decoration-color: rgba(255,255,255,.25);
+      text-underline-offset: 3px;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>💞 情侣抽签 / 随机挑战</h1>
+        <p>
+          抽一个挑战就去做：不重复、可导入、可倒计时挑战、刷新也保留。<br/>
+          小提示：想更像“游戏”一点就开「挑战模式」+ 设个倒计时。
+        </p>
+      </div>
+      <div class="chiprow">
+        <div class="chip">🎯 待抽：<b id="statRemaining">0</b></div>
+        <div class="chip">📜 已抽：<b id="statDrawn">0</b></div>
+        <div class="chip">🔥 连续挑战：<b id="statStreak">0</b></div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Left: Draw + Pool -->
+      <section class="card">
+        <div class="hd">
+          <h2>🎲 抽签控制台</h2>
+          <div class="btnrow">
+            <button class="primary" id="btnDraw">来一抽！</button>
+            <button class="mini warn" id="btnUndo">撤回上一抽</button>
+            <button class="mini bad" id="btnReset">重置全部</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="split">
+            <div>
+              <label><input type="checkbox" id="onlyFromRemaining" checked />只从“未抽过”里抽（不重复）</label>
+              <div class="hint">勾选后：抽过的不会再出现；取消勾选：会允许重复（更适合“无限挑战”）。</div>
+            </div>
+            <div>
+              <label><input type="checkbox" id="challengeMode" checked />挑战模式（带倒计时）</label>
+              <div class="hint">开启后会弹出挑战卡片，可设倒计时，完成后可记录“连续挑战”。</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="split">
+            <div>
+              <label>⏱️ 倒计时（分钟，可选）</label>
+              <input id="minutes" type="number" min="0" max="300" step="1" placeholder="例如：30" />
+              <div class="hint">填 0 或留空 = 不倒计时。比如设 30 分钟：抽到后一起完成挑战。</div>
+            </div>
+            <div>
+              <label>🎚️ 抽签动画速度</label>
+              <input id="spinSpeed" type="number" min="6" max="30" step="1" value="14" />
+              <div class="hint">数字越大越慢（默认 14）。如果你想更刺激：设 10～12。</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <h2 style="margin:0; font-size:14px;">🧺 挑战池（可编辑/导入）</h2>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+              <button class="mini good" id="btnLoadDefault">加载内置 100 条</button>
+              <button class="mini" id="btnExport">导出列表</button>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <label>📥 批量导入（每行一条 / CSV 也行）</label>
+            <textarea id="importBox" placeholder="粘贴你的清单：一行一个挑战，例如：
+一起去看日出日落
+一起做晚餐
+一起K歌
+（支持 CSV，用逗号分隔也可）"></textarea>
+            <div class="btnrow" style="margin-top:10px;">
+              <button class="good" id="btnImport">导入到挑战池</button>
+              <button class="mini bad" id="btnClearPool">清空挑战池</button>
+            </div>
+            <div class="hint">
+              ✅ 导入规则：会自动去空行、去重复（完全相同才算重复）。<br/>
+              ✅ 导入后会立即保存到本机浏览器（localStorage），刷新仍然存在。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: History -->
+      <aside class="card">
+        <div class="hd">
+          <h2>📜 历史记录</h2>
+          <div class="btnrow">
+            <button class="mini bad" id="btnClearHistory">清空历史</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="list" id="historyList"></div>
+          <div class="hint" id="historyHint"></div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="hr" style="margin-top:16px;"></div>
+    <div style="color:rgba(255,255,255,.65); font-size:12px; line-height:1.55;">
+      小技巧：你也可以把“挑战池”换成你们自己的专属清单，比如「每周一次小约会」「一起学一道菜」等等。<br/>
+      如果你想要“抽到就生成打卡卡片 + 分享图片”，也可以继续加功能。
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modalMask" id="mask">
+    <div class="modal" id="modal">
+      <div class="mhd">
+        <div class="ttl" id="modalTitle">🎯 本次挑战</div>
+        <button class="mini" id="btnClose">关闭</button>
+      </div>
+      <div class="mbd">
+        <div class="big" id="pickedText">—</div>
+        <div class="sub" id="pickedSub">—</div>
+
+        <div id="timerBox" style="display:none;">
+          <div class="timer">
+            <div class="left">
+              <div class="k">倒计时</div>
+              <div class="v" id="timerText">00:00</div>
+            </div>
+            <div style="min-width:160px; width:45%;">
+              <div class="progress"><i id="bar"></i></div>
+              <div class="hint" id="timerHint" style="margin:8px 0 0;">时间到会提示你们收尾/打卡。</div>
+            </div>
+          </div>
+          <div class="btnrow" style="margin-top:10px;">
+            <button class="mini warn" id="btnPause">暂停</button>
+            <button class="mini" id="btnRestart">重来</button>
+          </div>
+        </div>
+
+        <div class="btnrow" style="margin-top:6px;">
+          <button class="primary" id="btnDone">✅ 挑战完成！</button>
+          <button class="mini" id="btnRedraw">🔁 再抽一次</button>
+          <button class="mini bad" id="btnDeleteFromPool">🗑️ 从挑战池移除</button>
+        </div>
+
+        <div class="hint">
+          想更像游戏？可以在挑战完成后加一个小奖励：比如 “赢家点一杯奶茶” 😄
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="confetti" id="confetti"></div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /**********************
+     * Storage helpers
+     **********************/
+    const KEY = "couple_lottery_v1";
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        if(!raw) return null;
+        return JSON.parse(raw);
+      }catch(e){ return null; }
+    }
+    function saveState(){
+      localStorage.setItem(KEY, JSON.stringify(state));
+      render();
+    }
+
+    /**********************
+     * Default 100 items (from your list)
+     **********************/
+    const DEFAULT_100 = [
+      "一起看日出日落","在厨房一起做晚餐","逛超市买买买","在下雨天追剧","去看一场爱情电影","一起吃麻辣火锅","每天互道早晚安","用相机记录对方的样子","一起逛花鸟市场","做情侣头像",
+      "坐一次摩天轮","看一场演唱会","拍一套情侣写真","一起堆雪人","去海边吹吹风","一起放风筝","一起敷面膜护肤","住五星级酒店","洗完澡互吹头发","来一次彻夜长谈",
+      "偷拍对方模样","一起去划船","在等红绿灯时 kiss","为对方设计发型","一起逛寺庙祈福","雨天同撑一把伞","一起逛家居城","一起泡温泉","体验一次 live house","自驾游去旅行",
+      "去小清吧喝酒聊天","去看一次海底世界","一起做家务","做一次甜品蛋糕","养一只宠物","为对方准备生日惊喜","玩真心话大冒险","去一趟迪士尼乐园","喝醉一次","一起看樱花",
+      "接对方下班","一起健身减肥","一起滑雪","一起露营搭帐篷","吃遍各地好吃的","去漂流","一起体验射箭","一起逛菜市场","玩密室逃脱","玩分手厨房游戏",
+      "一起桑拿汗蒸","看望双方的父母","一起跨年","纪念日送礼物","一起吃绿皮火车","给对方搭配衣服","去天安门看升国旗","一起玩卡丁车","一起染头发","一起买彩票刮刮乐",
+      "同吃一根冰淇淋","一起逛公园拍照","一起泡脚","一起游戏厅抓娃娃","为对方画像","一起放孔明灯","制作手工钱包","一起穿情侣装逛街","去水果园摘水果","一起钓鱼",
+      "看童年看过的动画片","制作两人电子相册","一起放声K歌","一起压马路","讲睡前故事","给男朋友化妆","一起挑战趣味游戏","逛动物园","吃遍各种美食","宅家沉浸式看电影",
+      "一起淋雨","模仿对方小动作","一起去博物馆","夜骑单车兜风","一起露营野餐","偷偷买下Ta喜欢的东西","常把“爱你”挂嘴边","写一封告白信","一起做陶艺","一起去草原骑马",
+      "一起徒步爬泰山","一起培养一项兴趣爱好","做一次热气球","一起通宵看球","一起拼乐高","一起种一棵植物","洗出照片贴满房间","给对方做便当","一起规划彼此的未来","白头偕老在一起一辈子"
+    ];
+
+    /**********************
+     * State
+     **********************/
+    const saved = loadState();
+    const state = saved ?? {
+      pool: [...DEFAULT_100],
+      drawn: [],      // array of {text, ts}
+      streak: 0,
+      lastPick: null, // {text, ts}
+      settings: {
+        onlyFromRemaining: true,
+        challengeMode: true,
+        minutes: "",
+        spinSpeed: 14
+      }
+    };
+
+    /**********************
+     * DOM
+     **********************/
+    const $ = (id)=>document.getElementById(id);
+
+    const statRemaining = $("statRemaining");
+    const statDrawn = $("statDrawn");
+    const statStreak = $("statStreak");
+
+    const btnDraw = $("btnDraw");
+    const btnUndo = $("btnUndo");
+    const btnReset = $("btnReset");
+    const btnImport = $("btnImport");
+    const btnLoadDefault = $("btnLoadDefault");
+    const btnExport = $("btnExport");
+    const btnClearPool = $("btnClearPool");
+    const btnClearHistory = $("btnClearHistory");
+
+    const onlyFromRemaining = $("onlyFromRemaining");
+    const challengeMode = $("challengeMode");
+    const minutes = $("minutes");
+    const spinSpeed = $("spinSpeed");
+    const importBox = $("importBox");
+
+    const historyList = $("historyList");
+    const historyHint = $("historyHint");
+
+    // modal
+    const mask = $("mask");
+    const modal = $("modal");
+    const btnClose = $("btnClose");
+    const pickedText = $("pickedText");
+    const pickedSub = $("pickedSub");
+    const btnDone = $("btnDone");
+    const btnRedraw = $("btnRedraw");
+    const btnDeleteFromPool = $("btnDeleteFromPool");
+
+    // timer UI
+    const timerBox = $("timerBox");
+    const timerText = $("timerText");
+    const btnPause = $("btnPause");
+    const btnRestart = $("btnRestart");
+    const bar = $("bar");
+
+    const confetti = $("confetti");
+    const toast = $("toast");
+
+    /**********************
+     * Utility
+     **********************/
+    function nowTs(){ return Date.now(); }
+    function fmtTime(ts){
+      const d = new Date(ts);
+      const pad = (n)=>String(n).padStart(2,"0");
+      return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+    function uniqClean(items){
+      const out = [];
+      const seen = new Set();
+      for(const it of items){
+        const t = (it ?? "").toString().trim();
+        if(!t) continue;
+        if(seen.has(t)) continue;
+        seen.add(t);
+        out.push(t);
+      }
+      return out;
+    }
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=>toast.style.display="none", 2200);
+    }
+    function vibe(){
+      if(navigator.vibrate) navigator.vibrate([35, 30, 35]);
+    }
+    function burstConfetti(){
+      const colors = ["#ff4da6","#4de3ff","#46f59a","#ffcf4d","#ffffff"];
+      const n = 90;
+      const w = window.innerWidth;
+      for(let i=0;i<n;i++){
+        const el = document.createElement("div");
+        el.className = "c";
+        el.style.left = (Math.random()*w) + "px";
+        el.style.top = (-30 - Math.random()*200) + "px";
+        el.style.background = colors[Math.floor(Math.random()*colors.length)];
+        el.style.animationDuration = (1.8 + Math.random()*1.6) + "s";
+        el.style.animationDelay = (Math.random()*0.25) + "s";
+        el.style.transform = `translateY(-20px) rotate(${Math.random()*180}deg)`;
+        confetti.appendChild(el);
+        setTimeout(()=>el.remove(), 3800);
+      }
+    }
+
+    /**********************
+     * Draw logic
+     **********************/
+    function remainingList(){
+      const drawnSet = new Set(state.drawn.map(x=>x.text));
+      return state.pool.filter(x => !drawnSet.has(x));
+    }
+
+    // "spin" animation: quickly show random candidates before final pick
+    async function spinPick(candidates, speed){
+      // speed: 6~30 (bigger = slower)
+      const steps = 18 + Math.floor(Math.random()*10);
+      let chosen = candidates[Math.floor(Math.random()*candidates.length)];
+      for(let i=0;i<steps;i++){
+        chosen = candidates[Math.floor(Math.random()*candidates.length)];
+        pickedText.textContent = chosen;
+        await new Promise(r=>setTimeout(r, Math.max(25, 420 - speed*18)));
+      }
+      return chosen;
+    }
+
+    /**********************
+     * Timer
+     **********************/
+    let timer = {
+      active:false,
+      totalMs:0,
+      leftMs:0,
+      startAt:0,
+      paused:false
+    };
+    let timerInterval = null;
+
+    function stopTimer(){
+      timer.active = false;
+      timer.paused = false;
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerBox.style.display = "none";
+      bar.style.width = "0%";
+    }
+    function startTimer(minutesNum){
+      const ms = Math.max(0, Math.floor(minutesNum*60*1000));
+      if(ms <= 0){ stopTimer(); return; }
+      timer.active = true;
+      timer.totalMs = ms;
+      timer.leftMs = ms;
+      timer.startAt = Date.now();
+      timer.paused = false;
+      timerBox.style.display = "block";
+      btnPause.textContent = "暂停";
+      tickTimer(); // immediate
+      clearInterval(timerInterval);
+      timerInterval = setInterval(tickTimer, 250);
+    }
+    function tickTimer(){
+      if(!timer.active) return;
+      if(!timer.paused){
+        const now = Date.now();
+        const passed = now - timer.startAt;
+        timer.leftMs = Math.max(0, timer.totalMs - passed);
+      }
+      const s = Math.ceil(timer.leftMs/1000);
+      const mm = String(Math.floor(s/60)).padStart(2,"0");
+      const ss = String(s%60).padStart(2,"0");
+      timerText.textContent = `${mm}:${ss}`;
+      const pct = timer.totalMs ? (1 - timer.leftMs/timer.totalMs)*100 : 0;
+      bar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+
+      if(timer.leftMs <= 0){
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timer.active = false;
+        vibe();
+        showToast("⏰ 时间到啦！你们可以收尾/打卡～");
+        burstConfetti();
+      }
+    }
+    function togglePause(){
+      if(!timer.totalMs) return;
+      timer.paused = !timer.paused;
+      if(!timer.paused){
+        // resume: reset startAt based on leftMs
+        timer.startAt = Date.now() - (timer.totalMs - timer.leftMs);
+        btnPause.textContent = "暂停";
+      }else{
+        btnPause.textContent = "继续";
+      }
+    }
+    function restartTimer(){
+      if(!timer.totalMs) return;
+      startTimer(timer.totalMs/60000);
+    }
+
+    /**********************
+     * Modal control
+     **********************/
+    function openModal(){
+      mask.style.display = "flex";
+      requestAnimationFrame(()=>modal.classList.add("show"));
+    }
+    function closeModal(){
+      modal.classList.remove("show");
+      setTimeout(()=>{ mask.style.display = "none"; }, 140);
+      stopTimer();
+    }
+
+    /**********************
+     * Actions
+     **********************/
+    btnDraw.addEventListener("click", async ()=>{
+      const onlyRemain = onlyFromRemaining.checked;
+      const candidates = onlyRemain ? remainingList() : [...state.pool];
+
+      if(candidates.length === 0){
+        showToast("⚠️ 没有可抽的内容了，点“重置全部”或取消“只从未抽过里抽”。");
+        vibe();
+        return;
+      }
+
+      // open modal first
+      pickedText.textContent = "🎲 抽签中…";
+      pickedSub.textContent = "正在随机挑选一个挑战";
+      timerBox.style.display = "none";
+      openModal();
+
+      const speed = clamp(parseInt(spinSpeed.value,10) || 14, 6, 30);
+      const pick = await spinPick(candidates, speed);
+
+      const ts = nowTs();
+      state.lastPick = { text: pick, ts };
+
+      // record to history when in non-repeat mode or when user wants history anyway
+      state.drawn.unshift({ text: pick, ts });
+
+      // update subtitle
+      pickedText.textContent = pick;
+      pickedSub.textContent = `抽取时间：${fmtTime(ts)} · 历史记录已保存`;
+
+      // Challenge mode timer
+      if(challengeMode.checked){
+        const m = parseFloat(minutes.value);
+        if(!Number.isFinite(m) || m <= 0){
+          stopTimer();
+          timerBox.style.display = "none";
+        }else{
+          startTimer(m);
+        }
+      }else{
+        stopTimer();
+      }
+
+      vibe();
+      saveState();
+    });
+
+    btnDone.addEventListener("click", ()=>{
+      // increment streak if lastPick exists
+      if(state.lastPick?.text){
+        state.streak = (state.streak || 0) + 1;
+        saveState();
+        burstConfetti();
+        vibe();
+        showToast(`✅ 完成！连续挑战 +1（现在：${state.streak}）`);
+      }else{
+        showToast("先抽一个挑战再完成喔～");
+      }
+    });
+
+    btnRedraw.addEventListener("click", ()=>{
+      closeModal();
+      setTimeout(()=>btnDraw.click(), 120);
+    });
+
+    btnDeleteFromPool.addEventListener("click", ()=>{
+      const t = state.lastPick?.text;
+      if(!t) return;
+      state.pool = state.pool.filter(x=>x !== t);
+      showToast("已从挑战池移除这一条。");
+      vibe();
+      saveState();
+    });
+
+    btnClose.addEventListener("click", closeModal);
+    mask.addEventListener("click", (e)=>{ if(e.target === mask) closeModal(); });
+
+    btnPause.addEventListener("click", togglePause);
+    btnRestart.addEventListener("click", restartTimer);
+
+    btnUndo.addEventListener("click", ()=>{
+      if(state.drawn.length === 0){
+        showToast("没有可撤回的记录。");
+        return;
+      }
+      const removed = state.drawn.shift();
+      // If the undone one was lastPick, clear lastPick
+      if(state.lastPick?.text === removed.text) state.lastPick = null;
+      // Decrease streak slightly? 这里我不自动减 streak（更像“完成数”），你想减我也能改
+      showToast("已撤回上一抽。");
+      vibe();
+      saveState();
+    });
+
+    btnClearHistory.addEventListener("click", ()=>{
+      state.drawn = [];
+      state.lastPick = null;
+      state.streak = 0;
+      showToast("历史已清空（连续挑战也清零）。");
+      vibe();
+      saveState();
+    });
+
+    btnReset.addEventListener("click", ()=>{
+      // reset drawn only, keep pool
+      state.drawn = [];
+      state.lastPick = null;
+      state.streak = 0;
+      showToast("已重置：历史清空，待抽恢复。");
+      vibe();
+      saveState();
+    });
+
+    btnClearPool.addEventListener("click", ()=>{
+      state.pool = [];
+      showToast("挑战池已清空。你可以粘贴导入新的清单。");
+      vibe();
+      saveState();
+    });
+
+    btnLoadDefault.addEventListener("click", ()=>{
+      state.pool = [...DEFAULT_100];
+      showToast("已加载内置 100 条挑战。");
+      vibe();
+      saveState();
+    });
+
+    btnImport.addEventListener("click", ()=>{
+      const text = importBox.value || "";
+      const lines = text
+        .replace(/\r/g,"")
+        .split("\n")
+        .flatMap(line => {
+          // allow CSV separated by comma/Chinese comma/semicolon
+          const parts = line.split(/[,，;；]/g);
+          return parts.map(x=>x.trim()).filter(Boolean);
+        });
+
+      const merged = uniqClean([...(state.pool||[]), ...lines]);
+      const added = merged.length - (state.pool?.length || 0);
+      state.pool = merged;
+
+      importBox.value = "";
+      showToast(`导入完成：新增 ${Math.max(0, added)} 条。`);
+      vibe();
+      saveState();
+    });
+
+    btnExport.addEventListener("click", ()=>{
+      const content = (state.pool || []).join("\n");
+      const blob = new Blob([content], {type:"text/plain;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "couple_challenges.txt";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("已导出挑战池到 txt 文件。");
+    });
+
+    onlyFromRemaining.addEventListener("change", ()=>{
+      state.settings.onlyFromRemaining = onlyFromRemaining.checked;
+      saveState();
+    });
+    challengeMode.addEventListener("change", ()=>{
+      state.settings.challengeMode = challengeMode.checked;
+      saveState();
+    });
+    minutes.addEventListener("input", ()=>{
+      state.settings.minutes = minutes.value;
+      saveState();
+    });
+    spinSpeed.addEventListener("input", ()=>{
+      state.settings.spinSpeed = spinSpeed.value;
+      saveState();
+    });
+
+    function clamp(n,min,max){ return Math.min(max, Math.max(min, n)); }
+
+    /**********************
+     * Render
+     **********************/
+    function renderHistory(){
+      historyList.innerHTML = "";
+      const h = state.drawn || [];
+      if(h.length === 0){
+        historyHint.innerHTML = `还没有记录。点 <span class="mutedLink" id="hintDraw">来一抽！</span> 开始吧～`;
+        setTimeout(()=>{
+          const el = document.getElementById("hintDraw");
+          if(el) el.onclick = ()=>btnDraw.click();
+        },0);
+        return;
+      }
+      historyHint.textContent = "";
+
+      h.slice(0, 30).forEach((it, idx)=>{
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `
+          <div class="txt">
+            <div class="t">${escapeHtml(it.text)}</div>
+            <div class="s">
+              <span class="tag">🕒 ${escapeHtml(fmtTime(it.ts))}</span>
+              <span class="tag">#${idx+1}</span>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="mini" data-act="copy" data-i="${idx}">复制</button>
+          </div>
+        `;
+        historyList.appendChild(row);
+      });
+
+      // bind actions
+      historyList.querySelectorAll("button[data-act='copy']").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const i = parseInt(btn.getAttribute("data-i"),10);
+          const item = h[i];
+          if(!item) return;
+          try{
+            await navigator.clipboard.writeText(item.text);
+            showToast("已复制到剪贴板 ✅");
+          }catch{
+            // fallback
+            const ta = document.createElement("textarea");
+            ta.value = item.text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            ta.remove();
+            showToast("已复制 ✅");
+          }
+          vibe();
+        });
+      });
+
+      if(h.length > 30){
+        const more = document.createElement("div");
+        more.className = "hint";
+        more.textContent = `只显示最近 30 条历史（共 ${h.length} 条）。`;
+        historyList.appendChild(more);
+      }
+    }
+
+    function renderStats(){
+      const rem = remainingList().length;
+      const drawn = (state.drawn || []).length;
+      statRemaining.textContent = rem;
+      statDrawn.textContent = drawn;
+      statStreak.textContent = state.streak || 0;
+
+      btnUndo.disabled = drawn === 0;
+      btnDraw.disabled = (state.pool || []).length === 0;
+
+      // keep settings in sync
+      onlyFromRemaining.checked = !!state.settings.onlyFromRemaining;
+      challengeMode.checked = !!state.settings.challengeMode;
+      minutes.value = state.settings.minutes ?? "";
+      spinSpeed.value = state.settings.spinSpeed ?? 14;
+    }
+
+    function render(){
+      renderStats();
+      renderHistory();
+    }
+
+    function escapeHtml(s){
+      return (s ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // initial render
+    render();
+    saveState(); // ensure structure exists
+
+    // If user opens page first time, give a friendly toast
+    if(!saved){
+      setTimeout(()=>showToast("已加载内置 100 条挑战：点「来一抽！」开始 🎲"), 600);
+    }
+  </script>
+</body>
+</html>
